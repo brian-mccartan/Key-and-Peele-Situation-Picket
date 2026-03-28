@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Key & Peele — What's the Situation?</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --black: #0a0a0a;
+      --white: #f5f0e8;
+      --gold: #e8b84b;
+      --gold-dark: #b8892a;
+      --gray: #888;
+      --card-bg: #141414;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background-color: var(--black);
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 300;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    header {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 60px 24px 40px;
+      border-bottom: 1px solid #222;
+    }
+
+    .kp-logo { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+
+    .kp-badge {
+      background: var(--gold);
+      color: var(--black);
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 2px;
+      padding: 4px 10px;
+      border-radius: 2px;
+    }
+
+    .kp-sep { width: 1px; height: 20px; background: #444; }
+
+    .kp-label { font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); }
+
+    h1 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(52px, 10vw, 110px);
+      line-height: 0.92;
+      letter-spacing: 2px;
+      margin-bottom: 16px;
+    }
+
+    h1 span { color: var(--gold); display: block; }
+    .tagline { font-size: 14px; color: var(--gray); letter-spacing: 1px; font-style: italic; }
+
+    main {
+      position: relative;
+      z-index: 1;
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 56px 24px 80px;
+    }
+
+    .situation-label {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 13px;
+      letter-spacing: 4px;
+      color: var(--gold);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    textarea {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid #2a2a2a;
+      border-radius: 6px;
+      color: var(--white);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 17px;
+      font-weight: 300;
+      line-height: 1.6;
+      padding: 20px 22px;
+      resize: none;
+      min-height: 120px;
+      transition: border-color 0.2s;
+      outline: none;
+      caret-color: var(--gold);
+      margin-bottom: 10px;
+    }
+
+    textarea::placeholder { color: #444; font-style: italic; }
+    textarea:focus { border-color: #404040; }
+
+    .char-hint { text-align: right; font-size: 12px; color: #444; margin-bottom: 28px; font-style: italic; }
+
+    .options-row { display: flex; align-items: center; gap: 24px; margin-bottom: 32px; flex-wrap: wrap; }
+
+    .toggle-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-size: 13px;
+      color: var(--gray);
+      user-select: none;
+    }
+
+    .toggle-label input[type="checkbox"] {
+      appearance: none;
+      width: 36px;
+      height: 20px;
+      background: #222;
+      border: 1px solid #333;
+      border-radius: 10px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle-label input[type="checkbox"]::after {
+      content: '';
+      position: absolute;
+      top: 3px; left: 3px;
+      width: 12px; height: 12px;
+      background: #555;
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .toggle-label input[type="checkbox"]:checked { background: #2a2a1a; border-color: var(--gold-dark); }
+    .toggle-label input[type="checkbox"]:checked::after { transform: translateX(16px); background: var(--gold); }
+
+    .divider-dot { width: 3px; height: 3px; border-radius: 50%; background: #333; }
+
+    .btn-find {
+      width: 100%;
+      background: var(--gold);
+      color: var(--black);
+      border: none;
+      border-radius: 4px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      letter-spacing: 4px;
+      padding: 18px 24px;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    .btn-find:hover { background: #d4a63e; }
+    .btn-find:active { transform: scale(0.99); }
+    .btn-find:disabled { background: #2a2a1a; color: #666; cursor: not-allowed; transform: none; }
+
+    .loading { display: none; text-align: center; padding: 48px 0; }
+    .loading.visible { display: block; }
+
+    .spinner {
+      width: 32px; height: 32px;
+      border: 2px solid #222;
+      border-top-color: var(--gold);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 16px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .loading-text { font-size: 13px; color: var(--gray); font-style: italic; }
+
+    .results { display: none; margin-top: 48px; }
+    .results.visible { display: block; }
+
+    .results-header {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 4px;
+      color: var(--gray);
+      margin-bottom: 24px;
+      border-top: 1px solid #1e1e1e;
+      padding-top: 24px;
+    }
+
+    .result-card {
+      background: var(--card-bg);
+      border: 1px solid #1e1e1e;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .result-card-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 11px;
+      letter-spacing: 3px;
+      color: var(--gray);
+      margin-bottom: 16px;
+    }
+
+    .sketches-grid { display: grid; gap: 12px; }
+
+    .sketch-chip {
+      background: #0f0f0f;
+      border: 1px solid #1e1e1e;
+      border-radius: 6px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      transition: border-color 0.15s;
+      text-decoration: none;
+    }
+
+    .sketch-chip:hover { border-color: #333; }
+
+    .sketch-num {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      color: var(--gold);
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .sketch-chip-name { font-size: 14px; font-weight: 500; color: var(--white); margin-bottom: 4px; }
+    .sketch-chip-why { font-size: 12px; color: #555; font-style: italic; line-height: 1.5; }
+
+    .action-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 18px;
+      border-radius: 4px;
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 14px;
+      letter-spacing: 2px;
+      text-decoration: none;
+      transition: opacity 0.15s;
+      border: none;
+      cursor: pointer;
+    }
+
+    .action-btn:hover { opacity: 0.85; }
+
+    .btn-youtube { background: #ff0000; color: #fff; margin-right: 10px; margin-bottom: 8px; }
+    .btn-gif { background: #1a1a2e; border: 1px solid #2d2d4e; color: #8b85ff; margin-bottom: 8px; }
+
+    .error-msg {
+      background: #1a0808;
+      border: 1px solid #3a1010;
+      border-radius: 6px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: #e88;
+      margin-top: 16px;
+      display: none;
+      line-height: 1.7;
+    }
+
+    .error-msg.visible { display: block; }
+    .error-msg code { background: #2a1010; padding: 1px 5px; border-radius: 3px; font-size: 12px; }
+
+    footer {
+      position: relative;
+      z-index: 1;
+      text-align: center;
+      padding: 32px 24px 48px;
+      border-top: 1px solid #111;
+    }
+
+    .footer-text { font-size: 11px; color: #333; letter-spacing: 1px; line-height: 1.8; }
+    .footer-text a { color: #444; text-decoration: none; }
+    .footer-text a:hover { color: var(--gray); }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="kp-logo">
+      <span class="kp-badge">K&P</span>
+      <span class="kp-sep"></span>
+      <span class="kp-label">Sketch Finder</span>
+    </div>
+    <h1>What's the<span>Situation?</span></h1>
+    <p class="tagline">Key &amp; Peele have a sketch for everything. Let's find yours.</p>
+  </header>
+
+  <main>
+    <span class="situation-label">Describe your situation</span>
+
+    <textarea
+      id="situationInput"
+      placeholder="e.g. My coworker keeps taking credit for my ideas in meetings…"
+      maxlength="400"
+      rows="4"
+      autofocus
+    ></textarea>
+    <p class="char-hint">Be specific — the weirder, the better.</p>
+
+    <div class="options-row">
+      <label class="toggle-label">
+        <input type="checkbox" id="gifToggle" checked />
+        Include GIF suggestion
+      </label>
+      <span class="divider-dot"></span>
+      <label class="toggle-label">
+        <input type="checkbox" id="multiToggle" checked />
+        Show multiple sketches
+      </label>
+    </div>
+
+    <button class="btn-find" id="findBtn" onclick="findSketch()">
+      <span>Find the Sketch</span>
+      <span>→</span>
+    </button>
+
+    <div class="error-msg" id="errorMsg"></div>
+
+    <div class="loading" id="loading">
+      <div class="spinner"></div>
+      <p class="loading-text" id="loadingText">Scanning the vault…</p>
+    </div>
+
+    <div class="results" id="results"></div>
+  </main>
+
+  <footer>
+    <p class="footer-text">
+      Not affiliated with Key &amp; Peele, Comedy Central, or Viacom.<br />
+      All sketches are the property of their respective owners.<br />
+      <a href="https://github.com/" target="_blank">View on GitHub</a>
+    </p>
+  </footer>
+
+  <script>
+    // ─────────────────────────────────────────────────────────────────────────
+    //  STEP 1: Paste your free Gemini API key from https://aistudio.google.com
+    // ─────────────────────────────────────────────────────────────────────────
+    const GEMINI_API_KEY = 'YOUR_GEMINI_API_KEY_HERE';
+    // ─────────────────────────────────────────────────────────────────────────
+
+    const GEMINI_MODEL = 'gemini-2.5-flash';
+
+    const LOADING_MSGS = [
+      'Scanning 450+ sketches…',
+      'Channeling Key & Peele energy…',
+      'Consulting the substitute teacher…',
+      'East/West Bowl analysis in progress…',
+      'Asking Liam Neesons for help…',
+      'Alerting the Obama anger translator…',
+    ];
+
+    let loadingInterval;
+
+    function setLoading(on) {
+      const loadEl = document.getElementById('loading');
+      const btn    = document.getElementById('findBtn');
+      const res    = document.getElementById('results');
+      const err    = document.getElementById('errorMsg');
+      if (on) {
+        loadEl.classList.add('visible');
+        res.classList.remove('visible');
+        err.classList.remove('visible');
+        btn.disabled = true;
+        let i = 0;
+        document.getElementById('loadingText').textContent = LOADING_MSGS[0];
+        loadingInterval = setInterval(() => {
+          i = (i + 1) % LOADING_MSGS.length;
+          document.getElementById('loadingText').textContent = LOADING_MSGS[i];
+        }, 1800);
+      } else {
+        loadEl.classList.remove('visible');
+        btn.disabled = false;
+        clearInterval(loadingInterval);
+      }
+    }
+
+    function showError(html) {
+      const el = document.getElementById('errorMsg');
+      el.innerHTML = html;
+      el.classList.add('visible');
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function ytUrl(q)    { return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`; }
+    function giphyUrl(q) { return `https://giphy.com/search/${encodeURIComponent(q)}`; }
+
+    function renderResults(data) {
+      const container = document.getElementById('results');
+      const wantsGif  = document.getElementById('gifToggle').checked;
+
+      let html = `<p class="results-header">Results</p>`;
+
+      // ── Sketches card ──
+      html += `<div class="result-card"><p class="result-card-title">Key &amp; Peele Sketches</p>`;
+
+      if (data.sketches && data.sketches.length) {
+        html += `<div class="sketches-grid">`;
+        data.sketches.forEach((s, i) => {
+          html += `
+            <a href="${ytUrl('Key Peele ' + s.youtube_query)}" target="_blank" class="sketch-chip">
+              <span class="sketch-num">${i + 1}</span>
+              <div>
+                <p class="sketch-chip-name">${esc(s.name)}</p>
+                <p class="sketch-chip-why">${esc(s.why)}</p>
+              </div>
+            </a>`;
+        });
+        html += `</div>`;
+      }
+
+      html += `
+        <div style="margin-top:20px;">
+          <a href="${ytUrl(data.primary_youtube_query)}" target="_blank" class="action-btn btn-youtube">▶ Search YouTube</a>
+        </div>
+      </div>`;
+
+      // ── GIF card ──
+      if (wantsGif && data.gif) {
+        html += `
+          <div class="result-card">
+            <p class="result-card-title">GIF to go with it</p>
+            <p style="font-size:14px;color:#aaa;line-height:1.6;margin-bottom:18px;">${esc(data.gif.description)}</p>
+            <a href="${giphyUrl(data.gif.giphy_query)}" target="_blank" class="action-btn btn-gif">◈ Find GIF on Giphy</a>
+            <a href="${giphyUrl(data.gif.alternate_query)}" target="_blank" class="action-btn btn-gif">◈ Alternate GIF</a>
+          </div>`;
+      }
+
+      container.innerHTML = html;
+      container.classList.add('visible');
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    async function findSketch() {
+      if (GEMINI_API_KEY === 'YOUR_GEMINI_API_KEY_HERE') {
+        showError('Add your Gemini API key to the <code>GEMINI_API_KEY</code> variable near the top of the &lt;script&gt; block. See the README for step-by-step instructions.');
+        return;
+      }
+
+      const situation = document.getElementById('situationInput').value.trim();
+      if (!situation) {
+        showError("Tell me the situation first — don't leave me hanging.");
+        return;
+      }
+
+      const wantsGif      = document.getElementById('gifToggle').checked;
+      const wantsMultiple = document.getElementById('multiToggle').checked;
+      const sketchCount   = wantsMultiple ? '3 to 5' : 'exactly 1';
+
+      setLoading(true);
+
+      const systemText = `You are an expert on the Key & Peele sketch comedy series (Comedy Central, 2012–2015). You know every sketch — the premise, the cultural commentary, the absurdist escalation, the recurring characters.
+
+Given a situation, identify the most fitting Key & Peele sketch(es) and return optimised YouTube search queries.
+
+You MUST respond with ONLY valid JSON. No markdown. No backticks. No preamble. Raw JSON only.
+
+Required schema:
+{
+  "primary_youtube_query": "YouTube search string to find the top sketch — must start with 'Key Peele'",
+  "sketches": [
+    {
+      "name": "Exact sketch title as known from the show",
+      "why": "1-2 sentences explaining why this sketch fits the situation",
+      "youtube_query": "Specific search term for THIS sketch — do NOT include 'Key Peele', it is prepended automatically. Be specific, e.g. 'substitute teacher AR-KAN-SAS' not just 'substitute teacher'"
+    }
+  ],
+  "gif": {
+    "description": "Describe the reaction GIF energy that would perfectly match this situation",
+    "giphy_query": "Best Giphy search query for this reaction",
+    "alternate_query": "A second Giphy search for a different energy/vibe"
+  }
+}
+
+Rules:
+- Include ${sketchCount} sketch(es) in the sketches array, ranked best-fit first
+- The gif field is ${wantsGif ? 'required — fill it in' : 'not needed — set it to null'}
+- Sketch names must be accurate to the actual show
+- If the situation is vague, default to beloved/versatile K&P sketches`;
+
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
+      const payload = {
+        systemInstruction: {
+          parts: [{ text: systemText }]
+        },
+        contents: [{
+          role: 'user',
+          parts: [{ text: `Situation: "${situation}"` }]
+        }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          maxOutputTokens: 1024,
+          temperature: 0.7
+        }
+      };
+
+      try {
+        const resp = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!resp.ok) {
+          const errData = await resp.json().catch(() => ({}));
+          const msg = errData?.error?.message || `HTTP ${resp.status}`;
+          throw new Error(msg);
+        }
+
+        const data = await resp.json();
+
+        // Gemini response path: candidates[0].content.parts[0].text
+        const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!raw) throw new Error('Gemini returned an empty response. Try again.');
+
+        const clean  = raw.replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(clean);
+
+        setLoading(false);
+        renderResults(parsed);
+
+      } catch (err) {
+        setLoading(false);
+        console.error(err);
+        showError(`Something went wrong: ${esc(err.message)}`);
+      }
+    }
+
+    // Enter = submit, Shift+Enter = newline
+    document.getElementById('situationInput').addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        findSketch();
+      }
+    });
+  </script>
+
+</body>
+</html>
