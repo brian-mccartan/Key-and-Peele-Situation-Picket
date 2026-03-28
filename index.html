@@ -544,7 +544,9 @@ Rules:
         const raw = data?.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!raw) throw new Error('Gemini returned an empty response. Try again.');
 
-        const clean  = raw.replace(/```json|```/g, '').trim();
+const match = raw.match(/\{[\s\S]*\}/);
+if (!match) throw new Error('Could not find JSON in Gemini response.');
+const clean = match[0];
         const parsed = JSON.parse(clean);
 
         setLoading(false);
