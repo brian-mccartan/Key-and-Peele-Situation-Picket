@@ -520,7 +520,7 @@ Rules:
         }],
         generationConfig: {
           responseMimeType: 'application/json',
-          maxOutputTokens: 1024,
+          maxOutputTokens: 2048,
           temperature: 0.7
         }
       };
@@ -546,8 +546,11 @@ Rules:
 
 const match = raw.match(/\{[\s\S]*\}/);
 if (!match) throw new Error('Could not find JSON in Gemini response.');
+
+        const match = raw.match(/\{[\s\S]*\}/);
+if (!match) throw new Error('Could not find JSON in Gemini response.');
 const clean = match[0];
-        const parsed = JSON.parse(clean);
+const parsed = JSON.parse(clean);
 
         setLoading(false);
         renderResults(parsed);
