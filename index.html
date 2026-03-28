@@ -595,6 +595,138 @@
 
       const systemText = `You are an expert on the Key & Peele sketch comedy series (Comedy Central, 2012-2015). You know every sketch — the premise, the cultural commentary, the absurdist escalation, the recurring characters.
 
+<script>
+    const GEMINI_API_KEY = 'AIzaSyD2RnuGAM1UZaA1aLCvfQsBQZgKIgN56cs';
+    const GEMINI_MODEL = 'gemini-2.5-flash';
+
+    const LOADING_MSGS = [
+      'Scanning 450+ sketches…',
+      'Channeling Key & Peele energy…',
+      'Consulting the substitute teacher…',
+      'East/West Bowl analysis in progress…',
+      'Asking Liam Neesons for help…',
+      'Alerting the Obama anger translator…',
+    ];
+
+    let loadingInterval;
+
+    function setLoading(on) {
+      const loadEl = document.getElementById('loading');
+      const btn    = document.getElementById('findBtn');
+      const res    = document.getElementById('results');
+      const err    = document.getElementById('errorMsg');
+      if (on) {
+        loadEl.classList.add('visible');
+        res.classList.remove('visible');
+        err.classList.remove('visible');
+        btn.disabled = true;
+        let i = 0;
+        document.getElementById('loadingText').textContent = LOADING_MSGS[0];
+        loadingInterval = setInterval(() => {
+          i = (i + 1) % LOADING_MSGS.length;
+          document.getElementById('loadingText').textContent = LOADING_MSGS[i];
+        }, 1800);
+      } else {
+        loadEl.classList.remove('visible');
+        btn.disabled = false;
+        clearInterval(loadingInterval);
+      }
+    }
+
+    function showError(html) {
+      const el = document.getElementById('errorMsg');
+      el.innerHTML = html;
+      el.classList.add('visible');
+    }
+
+    function esc(s) {
+      const d = document.createElement('div');
+      d.textContent = s;
+      return d.innerHTML;
+    }
+
+    function ytUrl(q)    { return `https://www.youtube.com/results?search_query=${encodeURIComponent(q)}`; }
+    function giphyUrl(q) { return `https://giphy.com/search/${encodeURIComponent(q)}`; }
+
+    function renderResults(data) {
+      const container = document.getElementById('results');
+      const wantsGif  = document.getElementById('gifToggle').checked;
+
+      let html = `<p class="results-header">Results</p>`;
+
+      html += `<div class="result-card"><p class="result-card-title">Key &amp; Peele Sketches</p>`;
+
+      if (data.sketches && data.sketches.length) {
+        html += `<div class="sketches-grid">`;
+        data.sketches.forEach((s, i) => {
+          html += `
+            <a href="${ytUrl('Key Peele ' + s.youtube_query)}" target="_blank" class="sketch-chip">
+              <span class="sketch-num">${i + 1}</span>
+              <div>
+                <p class="sketch-chip-name">${esc(s.name)}</p>
+                <p class="sketch-chip-why">${esc(s.why)}</p>
+              </div>
+            </a>`;
+        });
+        html += `</div>`;
+      }
+
+      html += `
+        <div style="margin-top:20px;">
+          <a href="${ytUrl(data.primary_youtube_query)}" target="_blank" class="action-btn btn-youtube">▶ Search YouTube</a>
+        </div>
+      </div>`;
+
+      if (wantsGif && data.gif) {
+        html += `
+          <div class="result-card">
+            <p class="result-card-title">GIF to go with it</p>
+            <p style="font-size:14px;color:#aaa;line-height:1.6;margin-bottom:18px;">${esc(data.gif.description)}</p>
+            <a href="${giphyUrl(data.gif.giphy_query)}" target="_blank" class="action-btn btn-gif">◈ Find GIF on Giphy</a>
+            <a href="${giphyUrl(data.gif.alternate_query)}" target="_blank" class="action-btn btn-gif">◈ Alternate GIF</a>
+          </div>`;
+      }
+
+      container.innerHTML = html;
+      container.classList.add('visible');
+      container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function extractJSON(text) {
+      // Remove markdown fences
+      text = text.replace(/```json|```/g, '').trim();
+      // Find the outermost { } block
+      const start = text.indexOf('{');
+      const end   = text.lastIndexOf('}');
+      if (start === -1 || end === -1) throw new Error('No JSON object found in response.');
+      text = text.slice(start, end + 1);
+      // Remove trailing commas before } or ] which Gemini sometimes produces
+      text = text.replace(/,\s*([}\]])/g, '$1');
+      // Remove any control characters that break JSON parsing
+      text = text.replace(/[\x00-\x1F\x7F]/g, ' ');
+      return JSON.parse(text);
+    }
+
+    async function findSketch() {
+      if (GEMINI_API_KEY === 'YOUR_NEW_API_KEY_HERE') {
+        showError('Add your Gemini API key to the GEMINI_API_KEY variable at the top of the script.');
+        return;
+      }
+
+      const situation = document.getElementById('situationInput').value.trim();
+      if (!situation) {
+        showError("Tell me the situation first — don't leave me hanging.");
+        return;
+      }
+
+      const wantsGif      = document.getElementById('gifToggle').checked;
+      const wantsMultiple = document.getElementById('multiToggle').checked;
+      const sketchCount   = wantsMultiple ? '3 to 5' : 'exactly 1';
+
+      setLoading(true);
+
+      const systemText = `You are an expert on the Key & Peele sketch comedy series (Comedy Central, 2012-2015). You know every sketch — the premise, the cultural commentary, the absurdist escalation, the recurring characters.
+
 Given a situation, identify the most fitting Key and Peele sketches and return optimised YouTube search queries.
 
 Respond with ONLY a valid JSON object. No markdown. No backticks. No trailing commas. No comments. Pure JSON only.
@@ -669,5 +801,3 @@ Rules:
       }
     });
   </script>
-</body>
-</html>
